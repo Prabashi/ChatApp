@@ -6,7 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/chat': 'http://localhost:5065',
+      '/chatHub': {
+        target: 'http://localhost:5065',
+        ws: true,
+        changeOrigin: true,
+      },
     },
   },
 })

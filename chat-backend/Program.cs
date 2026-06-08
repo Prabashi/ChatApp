@@ -1,11 +1,16 @@
+using ChatApp.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
         policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowAnyMethod()
+              .AllowCredentials());
 });
 
 var app = builder.Build();
@@ -13,13 +18,6 @@ var app = builder.Build();
 app.UseCors();
 
 app.MapGet("/", () => "ChatApp API is running.");
-
-app.MapPost("/chat", (ChatRequest req) =>
-{
-    var reply = $"You said: {req.Message}";
-    return Results.Ok(new { reply });
-});
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
-
-record ChatRequest(string Message);
