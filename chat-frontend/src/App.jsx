@@ -56,6 +56,16 @@ export default function App() {
       .withAutomaticReconnect()
       .build()
 
+    connection.on('MessageHistory', (history) => {
+      const mapped = history.map(m => ({
+        id: m.id,
+        user: m.user,
+        text: m.text,
+        time: new Date(m.sentAt),
+      }))
+      setMessages(mapped)
+    })
+
     connection.on('ReceiveMessage', (user, message) => {
       setMessages(prev => [...prev, { id: Date.now() + Math.random(), user, text: message, time: new Date() }])
     })
