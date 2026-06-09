@@ -15,6 +15,18 @@ export default defineConfig({
         target: 'http://localhost:5065',
         changeOrigin: true,
       },
+      '/rooms': {
+        target: 'http://localhost:5065',
+        changeOrigin: true,
+      },
+      '/conversations': {
+        target: 'http://localhost:5065',
+        changeOrigin: true,
+      },
+      '/users': {
+        target: 'http://localhost:5065',
+        changeOrigin: true,
+      },
     },
   },
 })

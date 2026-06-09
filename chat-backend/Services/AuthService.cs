@@ -21,7 +21,7 @@ public class AuthService(IUserRepository users, IConfiguration config) : IAuthSe
             CreatedAt = DateTime.UtcNow,
         });
 
-        return new AuthResult(true, user.Username, null);
+        return new AuthResult(true, user, null);
     }
 
     public async Task<AuthResult> LoginAsync(string username, string password)
@@ -31,10 +31,10 @@ public class AuthService(IUserRepository users, IConfiguration config) : IAuthSe
         if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             return new AuthResult(false, null, "Invalid username or password.");
 
-        return new AuthResult(true, user.Username, null);
+        return new AuthResult(true, user, null);
     }
 
-    public string GenerateToken(string username)
+    public string GenerateToken(User user)
     {
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
@@ -42,7 +42,11 @@ public class AuthService(IUserRepository users, IConfiguration config) : IAuthSe
         var token = new JwtSecurityToken(
             issuer: config["Jwt:Issuer"],
             audience: config["Jwt:Audience"],
-            claims: [new Claim(ClaimTypes.Name, username)],
+            claims:
+            [
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+            ],
             expires: DateTime.UtcNow.AddHours(
                 double.Parse(config["Jwt:ExpiryHours"]!)),
             signingCredentials: new SigningCredentials(
